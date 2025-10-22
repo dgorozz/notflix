@@ -1,0 +1,198 @@
+[
+  {
+    "name": "House of the Dragon",
+    "description": "Precuela de Game of Thrones que narra la guerra civil Targaryen, conocida como la Danza de los Dragones.",
+    "gender": "Fantasía / Drama",
+    "episodes": {
+      "1": 10,
+      "2": 8
+    }
+  },
+  {
+    "name": "The Boys",
+    "description": "Un grupo de vigilantes se enfrenta a superhéroes corruptos que abusan de sus poderes.",
+    "gender": "Acción / Satira / Superhéroes",
+    "episodes": {
+      "1": 8,
+      "2": 8,
+      "3": 8,
+      "4": 8
+    }
+  },
+  {
+    "name": "Stranger Things",
+    "description": "Un grupo de niños en los años 80 enfrenta criaturas sobrenaturales del 'Upside Down'.",
+    "gender": "Ciencia ficción / Terror",
+    "episodes": {
+      "1": 8,
+      "2": 9,
+      "3": 8,
+      "4": 9
+    }
+  },
+  {
+    "name": "The Last of Us",
+    "description": "Joel y Ellie intentan sobrevivir en un mundo postapocalíptico dominado por un hongo mortal.",
+    "gender": "Drama / Ciencia ficción",
+    "episodes": {
+      "1": 9,
+      "2": 8
+    }
+  },
+  {
+    "name": "Succession",
+    "description": "Los miembros de una poderosa familia compiten por el control de un imperio mediático.",
+    "gender": "Drama",
+    "episodes": {
+      "1": 10,
+      "2": 10,
+      "3": 9,
+      "4": 10
+    }
+  },
+  {
+    "name": "The Mandalorian",
+    "description": "Un cazarrecompensas viaja por la galaxia con un misterioso niño de la raza de Yoda.",
+    "gender": "Ciencia ficción / Aventura",
+    "episodes": {
+      "1": 8,
+      "2": 8,
+      "3": 8
+    }
+  },
+  {
+    "name": "Euphoria",
+    "description": "Un grupo de adolescentes enfrenta temas de adicción, identidad y amor en la era digital.",
+    "gender": "Drama / Juvenil",
+    "episodes": {
+      "1": 8,
+      "2": 8
+    }
+  },
+  {
+    "name": "The Bear",
+    "description": "Un joven chef regresa a Chicago para dirigir la caótica cocina de su familia.",
+    "gender": "Drama / Comedia",
+    "episodes": {
+      "1": 8,
+      "2": 10,
+      "3": 10
+    }
+  },
+  {
+    "name": "Wednesday",
+    "description": "La hija de los Addams asiste a la Academia Nevermore mientras investiga misteriosos asesinatos.",
+    "gender": "Fantasía / Misterio",
+    "episodes": {
+      "1": 8
+    }
+  },
+  {
+    "name": "Loki",
+    "description": "El dios del engaño viaja por líneas temporales intentando corregir el caos que él mismo causó.",
+    "gender": "Ciencia ficción / Superhéroes",
+    "episodes": {
+      "1": 6,
+      "2": 6
+    }
+  },
+  {
+    "name": "Bridgerton",
+    "description": "En la alta sociedad londinense del siglo XIX, la familia Bridgerton busca amor y prestigio.",
+    "gender": "Drama / Romance",
+    "episodes": {
+      "1": 8,
+      "2": 8,
+      "3": 8
+    }
+  },
+  {
+    "name": "The Witcher",
+    "description": "Geralt de Rivia, un cazador de monstruos, lucha por encontrar su destino en un mundo hostil.",
+    "gender": "Fantasía / Aventura",
+    "episodes": {
+      "1": 8,
+      "2": 8,
+      "3": 8
+    }
+  },
+  {
+    "name": "Squid Game",
+    "description": "Personas con deudas compiten en juegos mortales para ganar una gran suma de dinero.",
+    "gender": "Thriller / Drama",
+    "episodes": {
+      "1": 9,
+      "2": 9
+    }
+  },
+  {
+    "name": "Severance",
+    "description": "Una empresa divide quirúrgicamente las memorias laborales y personales de sus empleados.",
+    "gender": "Ciencia ficción / Suspenso",
+    "episodes": {
+      "1": 9,
+      "2": 10
+    }
+  },
+  {
+    "name": "The White Lotus",
+    "description": "Un resort de lujo es escenario de dramas personales entre huéspedes y empleados.",
+    "gender": "Comedia / Drama",
+    "episodes": {
+      "1": 6,
+      "2": 7,
+      "3": 8
+    }
+  },
+  {
+    "name": "Better Call Saul",
+    "description": "La historia de cómo el abogado Jimmy McGill se convierte en el carismático Saul Goodman.",
+    "gender": "Drama / Crimen",
+    "episodes": {
+      "1": 10,
+      "2": 10,
+      "3": 10,
+      "4": 10,
+      "5": 10,
+      "6": 13
+    }
+  },
+  {
+    "name": "Arcane",
+    "description": "Basada en el universo de League of Legends, narra el conflicto entre las ciudades de Piltover y Zaun.",
+    "gender": "Animación / Fantasía",
+    "episodes": {
+      "1": 9,
+      "2": 9
+    }
+  },
+  {
+    "name": "The Umbrella Academy",
+    "description": "Una familia disfuncional de superhéroes intenta evitar el apocalipsis una y otra vez.",
+    "gender": "Superhéroes / Ciencia ficción",
+    "episodes": {
+      "1": 10,
+      "2": 10,
+      "3": 10,
+      "4": 6
+    }
+  },
+  {
+    "name": "One Piece",
+    "description": "Adaptación live-action del manga, sigue a Luffy y su tripulación en busca del legendario tesoro.",
+    "gender": "Aventura / Fantasía",
+    "episodes": {
+      "1": 8,
+      "2": 10
+    }
+  },
+  {
+    "name": "Andor",
+    "description": "La historia de Cassian Andor, un espía rebelde que desafía al Imperio antes de los eventos de Rogue One.",
+    "gender": "Ciencia ficción / Aventura",
+    "episodes": {
+      "1": 12,
+      "2": 12
+    }
+  }
+]
