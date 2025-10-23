@@ -41,6 +41,13 @@ def test_get_show_by_id(client: TestClient, db: Session):
     assert data["name"] == show.name
 
 
+def test_get_unexisting_show_throws_error(client: TestClient, db: Session):
+
+    response = client.get(f"/shows/123")
+
+    assert response.status_code == 404
+
+
 def test_start_show(client: TestClient, db: Session):
 
     show = _add_show_to_db(db, name="Breaking Bad", description="Walter White es un químico ...", gender="Acción", episodes=[3, 4, 3])
@@ -51,3 +58,16 @@ def test_start_show(client: TestClient, db: Session):
 
     session = db.get(models.Session, 1) # first session created -> id=1
     assert session and session.show_id == show.id
+
+
+def test_start_already_started_show_throws_error(client: TestClient, db: Session):
+
+    show = _add_show_to_db(db, name="Breaking Bad", description="Walter White es un químico ...", gender="Acción", episodes=[3, 4, 3])
+
+    response = client.post(f"/shows/{show.id}/start")
+
+    assert response.status_code == 200
+
+    response = client.post(f"/shows/{show.id}/start")
+
+    assert response.status_code == 409

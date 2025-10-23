@@ -6,8 +6,8 @@ from api.core import SessionState
 from tests.test_show import _add_show_to_db
 
 
-def _add_session_to_db(db: Session, show_id: int, current_season: int = 1, current_episode: int = 1, state: SessionState = SessionState.watching):
-    session = models.Session(show_id=show_id, current_season=current_season, current_episode=current_episode, state=state)
+def _add_session_to_db(db: Session, show_id: int, season: int = 1, episode: int = 1, state: SessionState = SessionState.watching):
+    session = models.Session(show_id=show_id, season=season, episode=episode, state=state)
     db.add(session)
     db.commit()
     return session
@@ -63,6 +63,17 @@ def test_get_sessions_filtered_by_state(client: TestClient, db: Session):
     assert data[0]["id"] == session2.id
 
 
+def test_get_sessions_filtered_by_unknown_state_throws_error(client: TestClient, db: Session):
+
+    show1, show2 = _add_dummy_shows_to_db(db)
+    session1 = _add_session_to_db(db, show_id=show1.id)
+    session2 = _add_session_to_db(db, show_id=show2.id, state=SessionState.finished)
+
+    response = client.get("/sessions?state=unknown_state")
+
+    assert response.status_code == 422 # Unprocessable entity
+
+
 def test_get_session_by_id(client: TestClient, db: Session):
 
     show, *_ = _add_dummy_shows_to_db(db)
@@ -74,9 +85,16 @@ def test_get_session_by_id(client: TestClient, db: Session):
 
     assert response.status_code == 200
     assert data["id"] == session.id
-    assert data["current_season"] == session.current_season
-    assert data["current_episode"] == session.current_episode
+    assert data["season"] == session.season
+    assert data["episode"] == session.episode
     assert data["state"] == session.state
+
+
+def test_get_not_existing_session_throws_error(client: TestClient, db: Session):
+
+    response = client.get(f"/sessions/200")
+
+    assert response.status_code == 404 # Not found
 
 
 def test_next_episode(client: TestClient, db: Session):
@@ -84,7 +102,7 @@ def test_next_episode(client: TestClient, db: Session):
     show, *_ = _add_dummy_shows_to_db(db)
     session = _add_session_to_db(db, show_id=show.id)
 
-    assert session.current_episode == 1
+    assert session.episode == 1
 
     response = client.post(f"/sessions/{session.id}/next")
 
@@ -92,16 +110,54 @@ def test_next_episode(client: TestClient, db: Session):
 
     assert response.status_code == 200
     assert data["id"] == session.id
-    assert data["current_season"] == session.current_season
-    assert data["current_episode"] == 2
+    assert data["season"] == session.season
+    assert data["episode"] == 2
+
+
+def test_next_episode_on_last_episode_set_session_finished(client: TestClient, db: Session):
+
+    show = _add_show_to_db(db, "Dummy show", "This is a dummy show", "dummy", [1])
+    session = _add_session_to_db(db, show_id=show.id)
+
+    assert session.season == 1
+    assert session.episode == 1
+    assert session.state == SessionState.watching
+
+    response = client.post(f"/sessions/{session.id}/next")
+
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["id"] == session.id
+    assert data["season"] == 1
+    assert data["episode"] == 1
+    assert data["state"] == SessionState.finished
+
+
+def test_next_episode_on_last_episode_of_season_one_navigate_to_first_episode_of_season_two(client: TestClient, db: Session):
+
+    show = _add_show_to_db(db, "Dummy show", "This is a dummy show", "dummy", [2, 3])
+    session = _add_session_to_db(db, show_id=show.id, season=1, episode=2)
+
+    assert session.season == 1
+    assert session.episode == 2
+
+    response = client.post(f"/sessions/{session.id}/next")
+
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["id"] == session.id
+    assert data["season"] == 2
+    assert data["episode"] == 1
 
 
 def test_previous_episode(client: TestClient, db: Session):
 
     show, *_ = _add_dummy_shows_to_db(db)
-    session = _add_session_to_db(db, show_id=show.id, current_episode=2)
+    session = _add_session_to_db(db, show_id=show.id, episode=2)
 
-    assert session.current_episode == 2
+    assert session.episode == 2
 
     response = client.post(f"/sessions/{session.id}/previous")
 
@@ -109,8 +165,36 @@ def test_previous_episode(client: TestClient, db: Session):
 
     assert response.status_code == 200
     assert data["id"] == session.id
-    assert data["current_season"] == session.current_season
-    assert data["current_episode"] == 1
+    assert data["season"] == session.season
+    assert data["episode"] == 1
+
+
+def test_previous_episode_on_first_episode_of_season_two_navigate_to_last_episode_of_season_one(client: TestClient, db: Session):
+
+    show = _add_show_to_db(db, "Dummy show", "This is a dummy show", "dummy", [2, 3])
+    session = _add_session_to_db(db, show_id=show.id, season=2, episode=1)
+
+    assert session.season == 2
+    assert session.episode == 1
+
+    response = client.post(f"/sessions/{session.id}/previous")
+
+    data = response.json()
+
+    assert response.status_code == 200
+    assert data["id"] == session.id
+    assert data["season"] == 1
+    assert data["episode"] == 2
+
+
+def test_previous_episode_on_first_episode_throws_error(client: TestClient, db: Session):
+
+    show = _add_show_to_db(db, "Dummy show", "This is a dummy show", "dummy", [2, 3])
+    session = _add_session_to_db(db, show_id=show.id)
+
+    response = client.post(f"/sessions/{session.id}/previous")
+
+    assert response.status_code == 400 # Bad request
 
 
 def test_goto_episode(client: TestClient, db: Session):
@@ -118,8 +202,8 @@ def test_goto_episode(client: TestClient, db: Session):
     show, *_ = _add_dummy_shows_to_db(db)
     session = _add_session_to_db(db, show_id=show.id)
 
-    assert session.current_season == 1
-    assert session.current_episode == 1
+    assert session.season == 1
+    assert session.episode == 1
 
     goto_season = 2
     goto_episode = 3
@@ -129,17 +213,57 @@ def test_goto_episode(client: TestClient, db: Session):
 
     assert response.status_code == 200
     assert data["id"] == session.id
-    assert data["current_season"] == goto_season
-    assert data["current_episode"] == goto_episode
+    assert data["season"] == goto_season
+    assert data["episode"] == goto_episode
+
+
+def test_navigate_through_finished_session_throws_error(client: TestClient, db: Session):
+
+    show, *_ = _add_dummy_shows_to_db(db)
+    session = _add_session_to_db(db, show_id=show.id)
+
+    session.state = SessionState.finished
+
+    assert session.state == SessionState.finished
+
+    response = client.post(f"/sessions/{session.id}/goto", json={"season": 2, "episode": 2})
+
+    assert response.status_code == 400
+
+    response = client.post(f"/sessions/{session.id}/next")
+
+    assert response.status_code == 400
+
+    response = client.post(f"/sessions/{session.id}/previous")
+
+    assert response.status_code == 400
+
+
+def test_goto_unexisting_episode_throws_error(client: TestClient, db: Session):
+
+    show, *_ = _add_dummy_shows_to_db(db)
+    session = _add_session_to_db(db, show_id=show.id)
+
+    goto_season = 200
+    goto_episode = 3
+    response = client.post(f"/sessions/{session.id}/goto", json={"season": goto_season, "episode": goto_episode})
+
+    assert response.status_code == 404
+
+    goto_season = 1
+    goto_episode = 500
+    response = client.post(f"/sessions/{session.id}/goto", json={"season": goto_season, "episode": goto_episode})
+
+    assert response.status_code == 404
 
 
 def test_restart_session(client: TestClient, db: Session):
 
     show, *_ = _add_dummy_shows_to_db(db)
-    session = _add_session_to_db(db, show_id=show.id, current_season=2, current_episode=3)
+    session = _add_session_to_db(db, show_id=show.id, season=2, episode=3)
 
-    assert session.current_season == 2
-    assert session.current_episode == 3
+    assert session.season == 2
+    assert session.episode == 3
 
     response = client.post(f"/sessions/{session.id}/restart")
 
@@ -147,15 +271,15 @@ def test_restart_session(client: TestClient, db: Session):
 
     assert response.status_code == 200
     assert data["id"] == session.id
-    assert data["current_season"] == 1
-    assert data["current_episode"] == 1
-    assert data["current_episode"] == 1
+    assert data["season"] == 1
+    assert data["episode"] == 1
+    assert data["episode"] == 1
 
 
 def test_delete_session(client: TestClient, db: Session):
 
     show, *_ = _add_dummy_shows_to_db(db)
-    session = _add_session_to_db(db, show_id=show.id, current_season=2, current_episode=3)
+    session = _add_session_to_db(db, show_id=show.id, season=2, episode=3)
 
     response = client.delete(f"/sessions/{session.id}")
 
@@ -164,3 +288,10 @@ def test_delete_session(client: TestClient, db: Session):
     session = db.get(models.Session, session.id)
 
     assert session is None
+
+
+def test_delete_unexisting_session_throws_error(client: TestClient, db: Session):
+
+    response = client.delete(f"/sessions/4545")
+
+    assert response.status_code == 404
