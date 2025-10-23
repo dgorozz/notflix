@@ -9,6 +9,12 @@ from api.core import SessionState
 
 
 
+def raise_error_if_finished(session: models.Session):
+    if session.state == SessionState.finished:
+        raise HTTPException(status_code=400, detail=f"Session with id {session.id} is marked as 'finished'. To navigate through episodes please restart it.")
+
+
+
 def get_sessions(db: Session, state: Optional[SessionState] = None):
     query = db.query(models.Session)
     if state:
@@ -40,18 +46,21 @@ def create_session(db: Session, session: schemas.SessionCreate):
 
 def next_episode(db: Session, session_id: int):
     session = get_session_by_id(db, session_id)
+
+    raise_error_if_finished(session)
+
     show = session.show
     total_seasons = len(show.episodes)
-    current_season = session.current_season
-    current_episode = session.current_episode
-    episodes_in_current_season = show.episodes[current_season - 1]
+    season = session.season
+    episode = session.episode
+    episodes_in_season = show.episodes[season - 1]
 
-    if current_episode < episodes_in_current_season:
-        session.current_episode += 1
+    if episode < episodes_in_season:
+        session.episode += 1
     else:
-        if current_season < total_seasons:
-            session.current_season += 1
-            session.current_episode = 1
+        if season < total_seasons:
+            session.season += 1
+            session.episode = 1
         else:
             session.state = SessionState.finished
 
@@ -62,18 +71,18 @@ def next_episode(db: Session, session_id: int):
 
 def previous_episode(db: Session, session_id: int):
     session = get_session_by_id(db, session_id)
+
+    raise_error_if_finished(session)
+
     show = session.show
 
-    if session.current_episode > 1:
-        session.current_episode -= 1
-    elif session.current_season > 1:
-        session.current_season -= 1
-        session.current_episode = show.episodes[session.current_season - 1]
+    if session.episode > 1:
+        session.episode -= 1
+    elif session.season > 1:
+        session.season -= 1
+        session.episode = show.episodes[session.season - 1]
     else:
-        raise HTTPException(status_code=400, detail="Ya estás en el primer episodio de la primera temporada")
-
-    if session.state == SessionState.finished:
-        session.state = SessionState.watching
+        raise HTTPException(status_code=400, detail="Already at first episode of the show")
 
     db.commit()
     db.refresh(session)
@@ -82,16 +91,19 @@ def previous_episode(db: Session, session_id: int):
 
 def goto_episode(db: Session, session_id: int, season: int, episode: int):
     session = get_session_by_id(db, session_id)
+
+    raise_error_if_finished(session)
+
     show = session.show
 
     if season < 1 or season > len(show.episodes):
-        raise HTTPException(status_code=400, detail=f"Season {season} does not exists. Show '{show.name}' only has {len(show.episodes)} seasons")
+        raise HTTPException(status_code=404, detail=f"Season {season} does not exists. Show '{show.name}' only has {len(show.episodes)} seasons")
 
     if episode < 1 or episode > show.episodes[season - 1]:
-        raise HTTPException(status_code=400, detail=f"Episode {episode} of season {season} does not exists. Season {season} of '{show.name}' only have {show.episodes[season - 1]} episodes.")
+        raise HTTPException(status_code=404, detail=f"Episode {episode} of season {season} does not exists. Season {season} of '{show.name}' only have {show.episodes[season - 1]} episodes.")
 
-    session.current_season = season
-    session.current_episode = episode
+    session.season = season
+    session.episode = episode
     session.state = SessionState.watching
 
     db.commit()
@@ -101,8 +113,8 @@ def goto_episode(db: Session, session_id: int, season: int, episode: int):
 
 def restart_show(db: Session, session_id: int):
     session = get_session_by_id(db, session_id)
-    session.current_season = 1
-    session.current_episode = 1
+    session.season = 1
+    session.episode = 1
     session.state = models.SessionState.watching
     db.commit()
     db.refresh(session)

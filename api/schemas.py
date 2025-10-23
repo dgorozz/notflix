@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
+from datetime import datetime
 
 from api.core import SessionState
 
@@ -22,18 +23,21 @@ class Show(ShowBase):
 
 # ======== SESSIONS ========
 class SessionBase(BaseModel):
-    show_id: int
-    current_season: int = Field(1, ge=1)
-    current_episode: int = Field(1, ge=1)
+    show_id: Optional[int]
+    season: int = Field(1, ge=1)
+    episode: int = Field(1, ge=1)
     state: SessionState = Field(SessionState.watching)
 
-class SessionCreate(BaseModel):
+class SessionCreate(SessionBase):
+    show_id: int = Field(...)
+    start_date: datetime = Field(...)
     pass
 
 class SessionUpdate(BaseModel):
     season: Optional[int] = None
     episode: Optional[int] = None
     state: Optional[SessionState] = None
+    end_date: datetime = Field(None)
 
 class Session(SessionBase):
     id: int

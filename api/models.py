@@ -25,8 +25,8 @@ class Session(DecBase):
 
     id = Column(Integer, primary_key=True, index=True)
     show_id = Column(Integer, ForeignKey("shows.id", ondelete="CASCADE"), nullable=False)
-    current_season = Column(Integer, default=1)
-    current_episode = Column(Integer, default=1)
+    season = Column(Integer, default=1)
+    episode = Column(Integer, default=1)
     state = Column(Enum(SessionState), default=SessionState.watching, nullable=False)
     start_date = Column(DateTime)
     end_date = Column(DateTime)
