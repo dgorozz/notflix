@@ -37,6 +37,11 @@ def delete_session_by_id(db: Session, session_id: int):
 
 
 def create_session(db: Session, session: schemas.SessionCreate):
+
+    existing_session_with_same_showid = db.query(models.Session).filter(models.Session.show_id == session.show_id).first()
+    if existing_session_with_same_showid:
+        raise HTTPException(status_code=409, detail=f"Show with id {session.show_id} already started in session {existing_session_with_same_showid.id}")
+
     db_session = models.Session(**session.model_dump())
     db.add(db_session)
     db.commit()
