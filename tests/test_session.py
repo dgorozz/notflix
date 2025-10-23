@@ -122,6 +122,7 @@ def test_next_episode_on_last_episode_set_session_finished(client: TestClient, d
     assert session.season == 1
     assert session.episode == 1
     assert session.state == SessionState.watching
+    assert session.end_date is None
 
     response = client.post(f"/sessions/{session.id}/next")
 
@@ -132,6 +133,7 @@ def test_next_episode_on_last_episode_set_session_finished(client: TestClient, d
     assert data["season"] == 1
     assert data["episode"] == 1
     assert data["state"] == SessionState.finished
+    assert data["end_date"] is not None
 
 
 def test_next_episode_on_last_episode_of_season_one_navigate_to_first_episode_of_season_two(client: TestClient, db: Session):
@@ -273,7 +275,7 @@ def test_restart_session(client: TestClient, db: Session):
     assert data["id"] == session.id
     assert data["season"] == 1
     assert data["episode"] == 1
-    assert data["episode"] == 1
+    assert data["end_date"] is None
 
 
 def test_delete_session(client: TestClient, db: Session):
