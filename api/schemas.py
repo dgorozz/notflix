@@ -27,6 +27,8 @@ class SessionBase(BaseModel):
     season: int = Field(1, ge=1)
     episode: int = Field(1, ge=1)
     state: SessionState = Field(SessionState.watching)
+    start_date: Optional[datetime] = Field(None)
+    end_date: Optional[datetime] = Field(None)
 
 class SessionCreate(SessionBase):
     show_id: int = Field(...)

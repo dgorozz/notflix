@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 
 from typing import Optional
+from datetime import datetime
 
 from api import models
 from api import schemas
@@ -67,6 +68,7 @@ def next_episode(db: Session, session_id: int):
             session.season += 1
             session.episode = 1
         else:
+            session.end_date = datetime.today()
             session.state = SessionState.finished
 
     db.commit()
@@ -120,6 +122,7 @@ def restart_show(db: Session, session_id: int):
     session = get_session_by_id(db, session_id)
     session.season = 1
     session.episode = 1
+    session.end_date = None
     session.state = models.SessionState.watching
     db.commit()
     db.refresh(session)
