@@ -4,11 +4,13 @@ import sys
 
 API_URL = "http://localhost:8000"
 
+BLUE_COLOR = "\033[94m"
+RESET_COLOR = "\033[0m"
 
 
 class NotflixCLI(cmd.Cmd):
-    intro = "🎬 Welcome to Notflix CLI. Write 'help' or '?' to see available commands.\n"
-    prompt = "notflix> "
+    intro = "\n🎬 Welcome to Notflix CLI. Write 'help' or '?' to see available commands.\n"
+    prompt = f"{BLUE_COLOR}notflix> {RESET_COLOR}"
 
     # ----------------------------
     # COMANDOS DE SHOWS
