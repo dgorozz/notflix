@@ -93,6 +93,7 @@ session <session_id> goto <season> <episode> -> go to specific episode
 
 - En todos los casos que implique buscar por id, si la session/show no se encuntra, lanza un error 404.
 - En los casos que implique navegación entre episodios (next, previous, goto), si la sesión está con `state=finished`, lanza error 400.
+- Los shows no están pensados para ser añadidos por API, por eso no se ha falicitado un endpoint para ello. El script que rellena la tabla interactúa directamente con el ORM, importando la DB desde api.databse.
 
 ## Testing
 
